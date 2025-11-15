@@ -4,9 +4,41 @@ export default function App() {
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
-  const currentYear = new Date().getFullYear();
-  console.log(currentYear);
-  const getYear = currentYear - year;
+
+  const [age, setAge] = useState({
+    years: "--",
+    months: "--",
+    days: "--",
+  });
+
+  function calculateAge() {
+    const birth = new Date(year, month - 1, day);
+    const today = new Date();
+
+    if (isNaN(birth)) return;
+
+    let y = today.getFullYear() - birth.getFullYear();
+    let m = today.getMonth() - birth.getMonth();
+    let d = today.getDate() - birth.getDate();
+
+    if (d < 0) {
+      const prevMonthDays = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0
+      ).getDate();
+      d += prevMonthDays;
+      m--;
+    }
+
+    if (m < 0) {
+      m += 12;
+      y--;
+    }
+
+    setAge({ years: y, months: m, days: d });
+  }
+
   return (
     <div className="app">
       <div className="inner-app">
@@ -18,20 +50,23 @@ export default function App() {
           year={year}
           setYear={setYear}
         />
-        <hr style={{ backgroundColor: " red" }}></hr>
+
+        <hr style={{ backgroundColor: "red" }} />
+
         <div>
           <Output>
-            <span>{year === "" ? "- -" : getYear} </span>years
+            <span>{age.years}</span> years
           </Output>
           <Output>
-            <span>- -</span>month
+            <span>{age.months}</span> months
           </Output>
           <Output>
-            <span>- -</span>days
+            <span>{age.days}</span> days
           </Output>
         </div>
       </div>
-      <Button></Button>
+
+      <Button onClick={calculateAge} />
     </div>
   );
 }
@@ -73,9 +108,9 @@ function Inputs({ day, setDay, month, setMonth, year, setYear }) {
   );
 }
 
-function Button() {
+function Button({ onClick }) {
   return (
-    <button className="btn">
+    <button className="btn" onClick={onClick}>
       <img
         className="btn-icon"
         src="../assets/images/icon-arrow.svg"
@@ -84,6 +119,7 @@ function Button() {
     </button>
   );
 }
+
 function Output({ children }) {
   return (
     <div>
